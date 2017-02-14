@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
+
+function showtext()
+{  #params on left size can start with -- which are settings, all other params goes to var text.
+   forcecreation=0 ; pointsize=96 ; pngposx="" ; pngposy="" # defaults
+   while [ "${1:0:2}" == "--" ]; do
+      case "$1" in
+         --forcecreation) forcecreation=1 ;;
+             --pointsize) shift; pointsize=$1 ;;
+                     --x) shift; pngposx="-x $1" ;;
+                     --y) shift; pngposy="-y $1" ;;
+		       *) shift; break ;;
+      esac; shift
+   done
+   text="$@"
+   md5hash=$(echo -n "$text$pointsize" | md5sum | grep -io '[0-9a-f]*')
+   mkdir -p "$logdir/osdpngs"
+   pngfile="$logdir/osdpngs/$md5hash.png"
+   if [ ! -f "$pngfile" ] || [ $forcecreation -eq 1 ]; then
+      convert -background "rgba(0,0,0,0.3)" -fill white -font Liberation-Mono -pointsize $pointsize \
+              -bordercolor blue -border 3x3 label:"$text" $pngfile                     >&2
+   fi
+   pngview -b 0x0000 -l6 $pngposx $pngposy $pngfile &>/dev/null & echo -n "$!"  # PID will be echoed
+}
+
+case "$1" in
+     start) shift; showtext "$@" ;;
+     blink) shift; pid=$(showtext "$@") 
+	    killafter 4 $pid & 
+	    ;;
+togglehelp) shift; pidfnamehelp=$logdir/tmpOsdTextHelp.pid
+            if [ -f "$pidfnamehelp" ]; then 
+               kill $(cat "$pidfnamehelp"); rm $pidfnamehelp
+            else
+               helptext="$(./controller --printdefaultchannelkeys)"
+               showtext --pointsize 36 "Default Channels:\n$helptext" > $pidfnamehelp
+            fi
+            ;;
+      stop) ;; #not used, help use toggle
+esac
+
+#convert -background transparent -fill '#f00' -font Serto-Urhoy -pointsize 144 label:"$2" $pngfname 

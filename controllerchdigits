@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0")) ; . forall.sh #var logdir
+
+key="$1"; [ -z "$key" ] && exit 0
+
+osdpidsfile="$logdir/controllerchdigits.pid"
+prevosdpids="$(filevar $osdpidsfile '')"
+[ -z "$prevosdpids" ] || { kill $prevosdpids; rm -f $osdpidsfile; } #remove old
+
+chfile="$logdir/controllerchdigits.val"
+ chnum=$(filevar $chfile "")
+
+function endexit() 
+{  rm -f $chfile
+   if [ "$1" == "ch" ]; then [ -z "$chnum" ] && echo 3 || echo $((1000+$chnum))
+   else echo 3
+   fi
+   exit 1 
+}
+
+if   inarray  $key KEY_PLAY                     ; then
+	[ -z "$prevosdpids" ] && true || endexit ch  #do nothing on first enter
+elif inarray  $key KEY_NUMERIC_{0..9}           ; then
+        digit=${key: -1}
+	chnum=$chnum$digit ; echo -n $chnum > $chfile
+elif inarray $key KEY_CHANNELUP   KEY_VOLUMEUP  ; then
+        ((++chnum))        ; echo -n $chnum > $chfile
+elif inarray $key KEY_CHANNELDOWN KEY_VOLUMEDOWN; then
+        [ ! -z $chnum ] && [ $chnum -gt 1 ] && ((--chnum)) || chnum=""
+	                     echo -n $chnum > $chfile
+else #other keys   
+	endexit
+fi
+
+   chlist="$(awk '{print NR, $0}' tvchlist.txt | grep ^$chnum)"
+brieflist=$(head -n11 <<< "$chlist")
+
+[ $(wc -l <<< "$chlist") -eq 1 ] && endexit ch #only one left.
+
+# OSD:
+osdpid=$(./tvosd start --y 0          "$chnum?"   ); echo -n   $osdpid  >  "$osdpidsfile"
+osdpid=$(./tvosd start --pointsize 60 "$brieflist"); echo -n " $osdpid" >> "$osdpidsfile"
+
+# RESULT:
+
+exit 0

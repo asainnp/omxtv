@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
+channel="$1"
+
+######################################
+if [ "$channel" == "asaintest" ]; then
+   omxplayer -b --vol -2000 "http://192.168.1.102/asaintest.m3u8"
+   exit
+fi
+######################################
+./tvauth </dev/null &>/dev/null & echo $! > $logdir/tvauth.pid
+
+
+
+logfile="$logdir/tvsingle.log";                           #314kb max, remove if larger
+[ -f $logfile ] && [ $(du -sb $logfile | awk '{print $1}') -gt 314159 ] && rm $logfile 
+                                      
+
+gostream="/$channel.m3u8"
+allstreams="$(wget -qO- http://webtvstream.bhtelecom.ba${gostream} | grep '^/.*\.m3u8$')"
+
+highstream=$(grep    '1200\.m3u8' <<< "$allstreams" | head -n1)
+ lowstream=$(grep -v '1200\.m3u8' <<< "$allstreams" | head -n1)
+
+if inarray "--lowres" "$@"; then
+   [ ! -z "$lowstream"  ] && { gostream="$lowstream"; addosd="_low"; }
+else
+   [ ! -z "$highstream" ] &&   gostream="$highstream"
+fi
+targetlink="http://webtvstream.bhtelecom.ba${gostream}"
+
+echo "$(date): starting channel: $targetlink ... $@" | tee -a $logfile
+                           #./tvloop stop will kill radio osd.
+[[ $channel == *radio* ]] && ./tvosd start $channel$addosd \
+                          || ./tvosd blink $channel$addosd 
+omxplayer -b --vol $(./audio getdmbreal) "$targetlink"
+
+kill $(cat $logdir/tvauth.pid)
+
+#livestreamer "hlsvariant://http://webtvstream.bhtelecom.ba/$channel.m3u8" best --player omxplayer --fifo
+#omxplayer --vol -1200 --live --timeout 15 -g http://195.222.59.135/hls1/$channel_1200.m3u8
+# 135, 141, 146 are load-servers...
+#cd $logdir # so that omx log is inside fast tmpfs /tmp when '-g' option is on

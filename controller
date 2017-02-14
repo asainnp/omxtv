@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0")) ; . forall.sh #var logdir
+
+key="$1"; [ -z $key ] && exit
+csfile="$logdir/controllerstate"
+state=$(filevar "$csfile" idle)
+inarray $state idle playing selectchannel || state=idle
+
+function setstate() { state="$1"; echo $state > $csfile; }
+function toggle()
+{  fname="toggle-$1"; cmd1="$2"; cmd2="$3"
+   if [ -f "$logdir/$fname" ]; then eval "$cmd2"; rm    "$logdir/$fname" 
+                               else eval "$cmd1"; touch "$logdir/$fname"; fi
+}
+
+directchannelslist=( bht1 ftv obn facetv tvsa pink_bh pink pink_comedy pink_pedia tv1    rtl2_hr   dm_sat    bjelasnica malta radio_fbih radio_bir )
+directchannelskeys=( KEY_NUMERIC_{1..9}                                      KEY_{RECORD,NUMERIC_0,FAVORITES,REWIND,FORWARD,RESTART,STOP} )
+
+if [ "$1" == "--printdefaultchannelkeys" ]; then
+   for i in ${!directchannelslist[@]}; do
+      printf "%16s -> %s\n" ${directchannelskeys[$i]} ${directchannelslist[$i]}
+   done
+   exit 0
+fi
+osdpid=$(./tvosd start --x 0 --y 0 --pointsize 48 "$key")
+	   echo i am in $state state
+case $state in
+   idle)
+      case $key in
+         KEY_POWER2) 
+            dan
+	    tv --lastusedchannel
+	    state=playing
+         ;;
+      esac
+   ;;
+   playing)
+      case $key in
+         KEY_SCREEN)     ./tvosd togglehelp  ;;
+         KEY_POWER2)     noc; ./tvloop stop; ./audio ontvoff; state=idle ;;
+         KEY_PLAY)       ./controllerchdigits $key;           state=selectchannel ;;
+         KEY_VOLUMEUP)   ./audio up          ;;
+         KEY_VOLUMEDOWN) ./audio down        ;;
+         KEY_MUTE)       ./audio togglemute  ;;
+         KEY_POWER2)     toggle isnoc     "noc ; ./tvloop stop; ./audio ontvoff"  "dan ; tv --lastusedchannel" ;;
+         KEY_TEXT)       toggle lowstream "tv --lastusedchannel" "tv --lastusedchannel --lowres" ;;
+      esac
+      result=$(indexof "$key" ${directchannelskeys[@]})
+      if [ $result -gt -1 ]; then
+         ./tv ${directchannelslist[$result]}
+      fi
+   ;;
+   selectchannel)
+      result=$(./controllerchdigits $key)
+      echo result=$result.
+      if   [ -z $result ]; then
+         true #nothing happened, do nothing
+      elif [ $result -eq 3 ]; then #cancel
+         state=playing
+      elif [ $result -gt 999 ]; then
+	 chaidx=$(($result-1000))
+	 chname=$(sed -n ${chaidx}p tvchlist.txt)
+	 [ -z $chname ] || ./tv $chname
+         state=playing
+      fi
+   ;;
+esac
+setstate $state
+kill $osdpid

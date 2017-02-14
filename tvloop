@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0"))
+. forall.sh #var logdir
+
+    cmd="$1"; shift
+channel="$1"; shift
+pidfile=$logdir/tvloop.pid
+
+[ -f "$pidfile"  ] &&  oldpidno=$(cat $pidfile)
+[ -z "$oldpidno" ] || oldpgidno=$(ps -o pgid= $oldpidno | grep -o [0-9]*)
+
+case "$cmd" in
+   start) $0 stop
+	  echo $$ > $pidfile
+          while true; do
+             echo "tvloop: starting: ./tvsingle "$channel" "$@""
+             ./tvsingle "$channel" "$@"
+          done
+          rm $pidfile
+	  ;;
+    stop) [ -z $oldpgidno ] || { kill -- -$oldpgidno ; rm $pidfile ; }
+	  ;;
+  status) echo "loop pidno=$oldpidno, pgidno=.$oldpgidno."
+	  [ -z $oldpidno ] || { ps auxww | grep $oldpidno; }
+	  ;;
+       *) echo "unknown command $cmd, allowed [start/stop/status]"
+	  exit 1
+	  ;;
+esac
+

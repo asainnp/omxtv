@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
+
+./controller $1
+exit
+
+function toggle()
+{
+   fname="toggle-$1"; cmd1="$2"; cmd2="$3"
+   if [ -f "$logdir/$fname" ]; then eval "$cmd2"; rm    "$logdir/$fname" 
+                               else eval "$cmd1"; touch "$logdir/$fname"; fi
+}
+
+osdpid=$(./tvosd start --y 0 --pointsize 48 "$1")
+
+case "$1" in
+      KEY_SCREEN) ./tvosd togglehelp ;;
+###tvlist:
+   KEY_NUMERIC_1) tv bht1        ;;
+   KEY_NUMERIC_2) tv ftv         ;;
+   KEY_NUMERIC_3) tv obn         ;;
+   KEY_NUMERIC_4) tv facetv      ;;
+   KEY_NUMERIC_5) tv tvsa        ;;
+   KEY_NUMERIC_6) tv pink_bh     ;;
+
+   KEY_NUMERIC_7) tv pink        ;;
+   KEY_NUMERIC_8) tv pink_comedy ;;
+   KEY_NUMERIC_9) tv pink_pedia  ;;
+
+      KEY_RECORD) tv tv1         ;;
+   KEY_NUMERIC_0) tv rtl2_hr     ;;
+   KEY_FAVORITES) tv dm_sat      ;;
+
+      KEY_REWIND) tv bjelasnica  ;; #kamera
+     KEY_FORWARD) tv malta       ;; #kamera
+
+     KEY_RESTART) tv radio_fbih  ;;
+        KEY_STOP) tv radio_bir   ;;
+###tvlist.
+    KEY_VOLUMEUP) ./audio up         ;;
+  KEY_VOLUMEDOWN) ./audio down       ;;
+        KEY_MUTE) ./audio togglemute ;;
+      KEY_POWER2) toggle isnoc     "noc ; ./tvloop stop; ./audio ontvoff"  "dan ; tv --lastusedchannel" ;;
+        KEY_TEXT) toggle lowstream "tv --lastusedchannel" "tv --lastusedchannel --lowres" ;;
+   #KEY_FAVORITES) toggle osdmarmunaga "./tvosd start marmunage" "./tvosd stop" ;;
+   #KEY_FAVORITES) echo 8
+   #               xrun pqiv -sfit --display=$DISPLAY --shuffle /mnt/wdelements/reserveDisks/hpArtComp/bitno2/samra
+   #               #fbi -vt 1 /mnt/wdelements/reserveDisks/hpArtComp/bitno2/samra/*.jpg &
+   #               ;;
+esac
+kill $osdpid

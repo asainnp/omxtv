@@ -1,0 +1,11 @@
+- bc
+- fzf
+- pngview
+- geteventsingle (manually rewritten)
+- vim (neobavezno)
+- wget
+- omxplayer
+zamjeniti user agenta u trenutnom libavformat libraiu:
+   /usr/lib/libavformat.so.57.56.100
+text Lavf/57.56.100 zamjeniti sa:
+     Moja WebTV RPi

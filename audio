@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
+
+faudiovol="$logdir/audiovol"
+    fmute="$logdir/audiomuted"
+function normalize()
+{  val=$1
+   if [ -z "$val" ]; then val=0
+   else
+      [ "$1" -gt 100 ] && val=100
+      [ "$1" -lt 0   ] && val=0
+   fi
+   printf $val
+}
+
+# get - return value in percents 0:100
+# getdbm - value in 'double' millibels used inside omxplayer, range: -6000:0
+# getdbl - value in float(double) range 0:1, used in dbus commands
+case "$1" in
+       get) [ -f "$faudiovol" ] && volume=$(cat "$faudiovol") || volume=$defaultaudiovol
+            printf $volume #in percents
+            ;;
+    getdmb) vol="$($0 get)"; [ $vol -lt 1 ] && { printf -6000; break; } #avoid log 0
+	    printf "%.0f"   $(bc -l <<< "scale=5; 2000 * l($vol / 100) / l(10)")
+            ;; #dmb means double millibels, used in omxplayer start command params and stdin (+/-) interface
+    getdbl) printf "%.2f" $(bc -l <<< "scale=2; $($0 get) / 100") ;;
+getdmbreal) #getdmbreal used in omxplayer start command, inside tvsingle script
+            [ -f $fmute ] && printf "%d" "-6000" || printf "%d"   $($0 getdmb) ;; #real value (0 if mutted)
+getdblreal) [ -f $fmute ] && printf 0            || printf "%.2f" $($0 getdbl) ;; #real value (0 if mutted)
+   showosd) str="$($0 get)%" 
+	    [ -f $fmute ] && str="MUTTED ( $str )" || str="volume: $str"
+	    ./tvosd blink "$str"
+	    ;;
+   ontvoff) rm $faudiovol ;; # Mr.Cazim's practice
+        up) val=$(normalize $(bc <<<"$($0 get) + 5"))
+            printf $val > $faudiovol
+	    $0 dbusset
+            ;;
+      down) val=$(normalize $(bc <<<"$($0 get) - 5"))
+            printf $val > $faudiovol
+	    $0 dbusset
+            ;;
+      mute) touch $fmute ; $0 dbusset ;;
+    unmute) rm    $fmute ; $0 dbusset ;;
+togglemute) [ -f $fmute ] && $0 unmute || $0 mute ;;
+   dbusset) settingval="$($0 getdblreal)" 
+            export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/omxplayerdbus.${USER:-root})
+            dbus-send --print-reply --session --reply-timeout=500 --dest=org.mpris.MediaPlayer2.omxplayer \
+                      /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Set \
+                      string:"org.mpris.MediaPlayer2.Player" \
+                      string:"Volume" double:"$settingval"
+	    $0 showosd
+            ;;
+esac
+

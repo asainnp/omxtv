@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+trap "" HUP #or ssh -t will not work
+cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
+
+flastch="$logdir/lastusedchannel"
+
+function channelok() { [ -z "$channel" ] || ! grep "^$channel$" tvchlist.txt && return 1; return 0; }
+
+if [ "${1:0:2}" == "--" ]; then #commands
+   case "$1" in
+      --lastusedchannel) [ -f $flastch ] && channel=$(cat $flastch) || channel="$defaultchannel"
+                         ;;
+   esac
+else
+   [ ! -z "$1" ] && { channel="$1"; shift; }
+fi
+
+channelok || channel=$(cat tvchlist.txt | fzf)  # <--- MENU - SELECT !
+channelok || exit
+
+echo $channel > $logdir/lastusedchannel
+
+echo "tv: starting: setsid ./tvloop start $channel "$@" </dev/null &>/dev/null &"
+
+setsid ./tvloop start $channel "$@" </dev/null &>/dev/null &   # detached !!!
+#./tvloop start $channel "$@" #... this line instead above when debugging
