@@ -10,6 +10,10 @@ For using:
    /usr/lib/libavformat.so.57.56.10X
   which is user-agent string of http requests while hls segments download.
 
+For Web Control:
+- apache+php
+- ln -s /opt/omxtv/webcontrol /srv/http/tv or /var/www/tv (depends of apache ver)
+
 For compiling:
 - vim
 - git
