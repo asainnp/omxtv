@@ -14,12 +14,12 @@ osdpid=$(./tvosd start --x 0 --y 0 --pointsize 48 "$cmd")
 case $state in
    idle)
       case $cmd in
-         POWERON)    ./daynight day  ; ./tv --lastusedchannel;         state=playing ;;
+         POWERON)    ./tools/daynight day  ; ./tv --lastusedchannel;         state=playing ;;
       esac
    ;;
    playing)
       case $key in
-         POWEROFF)   ./daynight night; ./tvloop stop; ./audio ontvoff; state=idle    ;;
+         POWEROFF)   ./tools/daynight night; ./tvloop stop; ./audio ontvoff; state=idle    ;;
          VOLUMEUP)   ./audio up      ;;
          VOLUMEDOWN) ./audio down    ;;
          MUTE)       ./audio mute    ;;
