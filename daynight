@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+case "$1" in
+   day)   /opt/vc/bin/tvservice -p ;;
+   night) /opt/vc/bin/tvservice -o ;;
+esac

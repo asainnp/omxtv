@@ -8,7 +8,7 @@ if [ "$channel" == "asaintest" ]; then
    exit
 fi
 ######################################
-./tvauth </dev/null &>/dev/null & echo $! > $logdir/tvauth.pid
+./tvauthloop </dev/null &>/dev/null & echo $! > $logdir/tvauthloop.pid
 
 
 
@@ -35,7 +35,7 @@ echo "$(date): starting channel: $targetlink ... $@" | tee -a $logfile
                           || ./tvosd blink $channel$addosd 
 omxplayer -b --vol $(./audio getdmbreal) "$targetlink"
 
-kill $(cat $logdir/tvauth.pid)
+kill $(cat $logdir/tvauthloop.pid)
 
 #livestreamer "hlsvariant://http://webtvstream.bhtelecom.ba/$channel.m3u8" best --player omxplayer --fifo
 #omxplayer --vol -1200 --live --timeout 15 -g http://195.222.59.135/hls1/$channel_1200.m3u8

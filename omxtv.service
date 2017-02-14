@@ -3,9 +3,8 @@ Description=MWTV, Moja Web TV, start up programs
 
 [Service]
 Type=simple
-User=asain
-ExecStart=/home/asain/myscripts/tv/infraredloop
-PIDFile=/tmp/mwtvomxplayerlogandstatus/infraredloop.pid
+ExecStart=/opt/omxtv/cmdloop
+PIDFile=/tmp/omxtvstatuslog/cmdloop.pid
 
 [Install]
 WantedBy=multi-user.target

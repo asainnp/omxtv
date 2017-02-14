@@ -1,12 +1,11 @@
 #script supposed to be sourced with . forall.sh
 
-logdir="/tmp/mwtvomxplayerlogandstatus" #note when changing logdir, to change
-                                        #      asain.service pid location too.
+logdir="/tmp/omxtvstatuslog" #note: when changing var logdir, or pidfilecmdloop, 
+mkdir -p "$logdir"           #      change pid location too inside omxtv.service.
+pidfilecmdloop=$logdir/cmdloop.pid
 
 defaultchannel="bht1" # defchan -for case that lastchannel file do not exists
 defaultaudiovol="10"  # 10%
-
-mkdir -p "$logdir"
 
 function inarray()
 {  search="$1"; shift

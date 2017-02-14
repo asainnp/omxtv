@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-#script is called from systemd directly, in /etc/systemd/system/multi-user.target.wants/asain.service
 
-cd $(dirname $(readlink -f "$0"))
-. forall.sh #var logdir
+#script is auto-started on boot by systemd symlink: 
+#   /etc/systemd/system/multi-user.target.wants/omxtv.service
 
-pidfile=$logdir/infraredloop.pid
+cd $(dirname $(readlink -f "$0")) ; . forall.sh #var logdir, pidcmdloop
+
 cd $(dirname $([ -L "$0" ] && echo $(readlink "$0") || echo "$0"))
 
 eventdaljinski="/dev/input/by-id/$(ls /dev/input/by-id | grep -i twinhan | grep -vi mouse | tail -n1)"
 eventdaljinski="$(readlink -f $eventdaljinski)"
 
-echo $$ > $pidfile
+echo $$ > $pidfilecmdloop
 while true; do
    key="$(sudo ./infraredgeteventsingle $eventdaljinski | tail -n1)"
    echo "switching key $key"

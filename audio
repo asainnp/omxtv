@@ -2,8 +2,13 @@
 
 cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
 
-faudiovol="$logdir/audiovol"
-    fmute="$logdir/audiomuted"
+    faudiovol="$logdir/audiovol"
+        fmute="$logdir/audiomuted"
+    fwantmute="$logdir/audiowantmute"
+     fwantval="$logdir/audiowantval"
+ flagdbusbusy="$logdir/audioflagdbusbusy"
+flagdbusdelay="$logdir/audioflagdbusdelay"
+
 function normalize()
 {  val=$1
    if [ -z "$val" ]; then val=0
@@ -13,44 +18,65 @@ function normalize()
    fi
    printf $val
 }
-
+function getpercents()
+{  [ -f "$faudiovol" ] && volume=$(cat "$faudiovol") || volume=$defaultaudiovol
+   printf $volume #in percents
+}
+function osdmain() 
+{  str="$(cat $faudiovol)%" 
+   [ -f $fmute ] && str="MUTTED ( $str )" || str="volume: $str"
+   ./tvosd blink "$str"
+}
+function osdwishes()
+{  str="cmd: $(cat $fwantval)%" 
+#   ./tvosd blink --y 0 "$str"
+}
+function mute()       { touch $fwantmute; osdmain; }
+function unmute()     { rm    $fwantmute; osdmain; }
+function togglemute() { [ -f  $fwantmute ] && unmute || mute ; }
+function percents2float() { printf "%.2f" $(bc -l <<< "scale=2; $1 / 100"); }
+function float2percents() { printf "%d"   $(bc -l <<< "$1 * 100"); }
+function dbussetcommand()
+{   rm -f $flagdbusdelay
+    touch $flagdbusbusy
+    settingvalpercents="$(cat $fwantval)"
+    settingvalfloat="$(percents2float $settingvalpercents)"
+    export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/omxplayerdbus.${USER:-root})
+    dbus-send --print-reply --session --reply-timeout=500 --dest=org.mpris.MediaPlayer2.omxplayer \
+           /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Set \
+           string:"org.mpris.MediaPlayer2.Player" \
+           string:"Volume" double:"$settingvalfloat" &>/dev/null
+    echo -n $settingvalpercents > $faudiovol
+    rm    $flagdbusbusy
+    osdmain
+}
+function dbusset() 
+{  osdwishes
+   if [ -f $flagdbusbusy ]; then
+      if [ ! -f $flagdbusdelay ]; then
+         ( sleep 2; dbusset; ) & touch $flagdbusdelay
+      fi
+   else
+      dbussetcommand &
+   fi
+}
 # get - return value in percents 0:100
 # getdbm - value in 'double' millibels used inside omxplayer, range: -6000:0
 # getdbl - value in float(double) range 0:1, used in dbus commands
 case "$1" in
-       get) [ -f "$faudiovol" ] && volume=$(cat "$faudiovol") || volume=$defaultaudiovol
-            printf $volume #in percents
-            ;;
-    getdmb) vol="$($0 get)"; [ $vol -lt 1 ] && { printf -6000; break; } #avoid log 0
+       get) getpercents ;;
+    getdmb) vol="$(getpercents)"; [ $vol -lt 1 ] && { printf -6000; break; } #avoid log 0
 	    printf "%.0f"   $(bc -l <<< "scale=5; 2000 * l($vol / 100) / l(10)")
             ;; #dmb means double millibels, used in omxplayer start command params and stdin (+/-) interface
-    getdbl) printf "%.2f" $(bc -l <<< "scale=2; $($0 get) / 100") ;;
+    getdbl) printf "%.2f" $(bc -l <<< "scale=2; $(getpercents) / 100") ;;
 getdmbreal) #getdmbreal used in omxplayer start command, inside tvsingle script
             [ -f $fmute ] && printf "%d" "-6000" || printf "%d"   $($0 getdmb) ;; #real value (0 if mutted)
 getdblreal) [ -f $fmute ] && printf 0            || printf "%.2f" $($0 getdbl) ;; #real value (0 if mutted)
-   showosd) str="$($0 get)%" 
-	    [ -f $fmute ] && str="MUTTED ( $str )" || str="volume: $str"
-	    ./tvosd blink "$str"
-	    ;;
    ontvoff) rm $faudiovol ;; # Mr.Cazim's practice
-        up) val=$(normalize $(bc <<<"$($0 get) + 5"))
-            printf $val > $faudiovol
-	    $0 dbusset
-            ;;
-      down) val=$(normalize $(bc <<<"$($0 get) - 5"))
-            printf $val > $faudiovol
-	    $0 dbusset
-            ;;
-      mute) touch $fmute ; $0 dbusset ;;
-    unmute) rm    $fmute ; $0 dbusset ;;
-togglemute) [ -f $fmute ] && $0 unmute || $0 mute ;;
-   dbusset) settingval="$($0 getdblreal)" 
-            export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/omxplayerdbus.${USER:-root})
-            dbus-send --print-reply --session --reply-timeout=500 --dest=org.mpris.MediaPlayer2.omxplayer \
-                      /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Set \
-                      string:"org.mpris.MediaPlayer2.Player" \
-                      string:"Volume" double:"$settingval"
-	    $0 showosd
-            ;;
+        up) val=$(normalize $(bc <<<"$(cat $fwantval) + 1"))
+            printf $val > $fwantval; echo wval: $val;              dbusset ;;
+      down) val=$(normalize $(bc <<<"$(cat $fwantval) - 1"))
+            printf $val > $fwantval;               dbusset ;;
+togglemute) togglemute;                            dbusset ;;
 esac
 
