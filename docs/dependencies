@@ -11,8 +11,13 @@ For using:
   which is user-agent string of http requests while hls segments download.
 
 For Web Control:
-- apache+php
-- ln -s /opt/omxtv/webcontrol /srv/http/tv or /var/www/tv (depends of apache ver)
+- apache, php, php-apache,
+     in httpd.conf changed loadmodule mod_mpm_event to mod_mpm_prefork
+     directoryindex index.php index.html
+     added lines: LoadModule php7_module modules/libphp7.so ; AddHandler php7-script php ; 
+                  Include conf/extra/php7_module.conf,
+     sudo systemctl enable httpd, ... start httpd
+- ln -s /opt/omxtv/webcontrol /srv/http/tv or /var/www/tv (depends of apache version)
 
 For compiling:
 - vim
