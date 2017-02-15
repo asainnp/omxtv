@@ -2,7 +2,7 @@
 
 cd $(dirname $(readlink -f "$0")) ; . forall.sh #var logdir
 
-cmd="$1"; [ -z $cmd ] && exit
+cmd="$1"; [ -z $cmd ] && exit ; shift
 csfile="$logdir/controllerstate"
 state=$(filevar "$csfile" idle)
 inarray $state idle playing || state=idle
@@ -18,15 +18,15 @@ case $state in
       esac
    ;;
    playing)
-      case $key in
+      case $cmd in
          POWEROFF)   ./tools/daynight night; ./tvloop stop; ./audio ontvoff; state=idle    ;;
-         VOLUMEUP)   ./audio up      ;;
-         VOLUMEDOWN) ./audio down    ;;
-         MUTE)       ./audio mute    ;;
-         UNMUTE)     ./audio unmute  ;;
+         VOLUMEUP)   ./tvaudio up      ;;
+         VOLUMEDOWN) ./tvaudio down    ;;
+         MUTE)       ./tvaudio mute    ;;
+         UNMUTE)     ./tvaudio unmute  ;;
          LOWRES)     ./tv --lastusedchannel --lowres ;;
          HIRES)      ./tv --lastusedchannel          ;;
-         PLAYCH)     ./tv $2         ;;
+         PLAYCH)     ./tv "$@"         ;;
       esac
    ;;
 esac

@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-#script is auto-started on boot by systemd symlink: 
-#   /etc/systemd/system/multi-user.target.wants/omxtv.service
+# cmdloop script is auto-started on boot by systemd symlink: 
+# /etc/systemd/system/multi-user.target.wants/omxtv.service -> /opt/omxtv/omxtv.service
 
-cd $(dirname $(readlink -f "$0")) ; . forall.sh #var logdir, pidcmdloop
+cd $(dirname $(readlink -f "$0")) 
+. forall.sh                       #var logdir, pidfilecmdloop
 
-cd $(dirname $([ -L "$0" ] && echo $(readlink "$0") || echo "$0"))
-
-eventdaljinski="/dev/input/by-id/$(ls /dev/input/by-id | grep -i twinhan | grep -vi mouse | tail -n1)"
-eventdaljinski="$(readlink -f $eventdaljinski)"
+maincmdfifo=$logdir/maincmdfifo
 
 echo $$ > $pidfilecmdloop
+
 while true; do
-   key="$(sudo ./infraredgeteventsingle $eventdaljinski | tail -n1)"
-   echo "switching key $key"
-   ./controller $key
+   [ -p $maincmdfifo ] || { mkfifo $maincmdfifo; chmod 666 $maincmdfifo; }
+   read cmd < $maincmdfifo
+   echo "switching command $cmd"
+   ./controller $cmd
 done

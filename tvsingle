@@ -33,7 +33,7 @@ echo "$(date): starting channel: $targetlink ... $@" | tee -a $logfile
                            #./tvloop stop will kill radio osd.
 [[ $channel == *radio* ]] && ./tvosd start $channel$addosd \
                           || ./tvosd blink $channel$addosd 
-omxplayer -b --vol $(./audio getdmbreal) "$targetlink"
+omxplayer -b --vol $(./tvaudio getdmbreal) "$targetlink"
 
 kill $(cat $logdir/tvauthloop.pid)
 

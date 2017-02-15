@@ -1,5 +1,5 @@
 [Unit]
-Description=MWTV, Moja Web TV, start up programs
+Description=OmxTV, Moja Web TV, start up programs
 
 [Service]
 Type=simple
