@@ -8,8 +8,8 @@
 </style>
 </head>
 <ul>
-	<li><a href='tvcmd.php?cmd=TURNON'>Turn ON</a>
+	<li><a href='tvcmd.php?cmd=POWERON'>Power ON</a>
 	<li><a href='channels'>Channels</a>
 	<li><a href='audio'>Audio</a>
-	<li><a href='tvcmd.php?cmd=TURNOFF'>Turn OFF</a>
+	<li><a href='tvcmd.php?cmd=POWEROFF'>Power OFF</a>
 </ul>
