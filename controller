@@ -22,6 +22,7 @@ case $state in
          POWEROFF)   ./tools/daynight night; ./tvloop stop; ./audio ontvoff; state=idle    ;;
          VOLUMEUP)   ./tvaudio up      ;;
          VOLUMEDOWN) ./tvaudio down    ;;
+         VOLUMESET)  ./tvaudio set $1  ;;
          MUTE)       ./tvaudio mute    ;;
          UNMUTE)     ./tvaudio unmute  ;;
          LOWRES)     ./tv --lastusedchannel --lowres ;;

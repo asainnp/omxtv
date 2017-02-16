@@ -97,4 +97,5 @@ getdblreal) [ -f $fmute ] && printf 0            || printf "%.2f" $($0 getdbl) ;
       mute) touch $fwantmute;                                      dbusset ;;
     unmute) rm    $fwantmute;                                      dbusset ;;
 togglemute) togglemute;                                            dbusset ;;
+       set) echo -n $2 > $fwantvol;                                dbusset ;;
 esac
