@@ -38,6 +38,7 @@ $(confdir):
 	mkdir -p $@
 $(confdir)/userpass:
 	echo -e "userhere\npasswordhere" > $@
+	chmod 600 $@
 $(confdir)/tvaddresses:
 	echo -e "192.168.1.11\n192.168.1.12\n192.168.1.13" > $@
 ###################################
