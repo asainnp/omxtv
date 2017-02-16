@@ -1,5 +1,5 @@
 <head>
-<title>GRUNDIG</title>
+<title>Channels <?php echo file_get_contents("/etc/hostname"); ?></title>
 <style>
 	ul { list-style-type: none; margin:0; padding:0; }
 	a  { text-decoration: none; }

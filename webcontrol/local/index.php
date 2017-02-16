@@ -1,9 +1,9 @@
 <head>
-<title>GRUNDIG</title>
+<title>Menu <?php echo file_get_contents("/etc/hostname"); ?></title>
 <style>
 	ul { list-style-type: none; margin:0; padding:0; }
 	a  { text-decoration: none; }
-	a  { font-size: 2em; background: green; color: white; border-radius: .2em; padding:.1em; }
+	a  { font-size: 4em; background: green; color: white; border-radius: .2em; padding:.1em; }
 	li { margin: 1em; font-size:2em; }
 </style>
 </head>

@@ -7,6 +7,7 @@ installdir = /opt/omxtv
  toolfiles = tools/omxtv.service tools/daynight tools/pngview
   allfiles = $(mainfiles) $(toolfiles)
 apacheroot = /srv/http
+  sysdlink = /etc/systemd/system/multi-user.target.wants/omxtv.service
 
 ###################################
 all: $(allfiles)
@@ -15,14 +16,15 @@ tools/pngview:
 	cd tools/pngviewsrc && make
 
 ###################################
+# note: overwriting new version do not need uninstall before install.
+#
 install: configfiles
 	mkdir -p $(installdir)/tools
 	cp -v $(mainfiles) $(installdir)/
 	cp -v $(toolfiles) $(installdir)/tools
 	cp -rv webcontrol $(installdir)/
-	ln -s $(installdir)/webcontrol $(apacheroot)/tv
-	ln -s $(installdir)/tools/omxtv.service /etc/systemd/system/multi-user.target.wants/omxtv.service
-
+	[ -L $(apacheroot)/tv ] || ln -s $(installdir)/webcontrol          $(apacheroot)/tv
+	[ -L $(sysdlink)      ] || ln -s $(installdir)/tools/omxtv.service $(sysdlink)
 uninstall:
 	rm -f $(apacheroot)/tv
 	rm -f /etc/systemd/system/multi-user.target.wants/omxtv.service #symlink
@@ -41,4 +43,3 @@ $(confdir)/userpass:
 $(confdir)/tvaddresses:
 	echo -e "192.168.1.11\n192.168.1.12\n192.168.1.13" > $@
 ###################################
-

@@ -2,59 +2,76 @@
 
 cd $(dirname $(readlink -f "$0")); . forall.sh #var logdir
 
-    faudiovol="$logdir/audiovol"
-        fmute="$logdir/audiomuted"
-    fwantmute="$logdir/audiowantmute"
-     fwantval="$logdir/audiowantval"
- flagdbusbusy="$logdir/audioflagdbusbusy"
-flagdbusdelay="$logdir/audioflagdbusdelay"
+    faudiovol="$logdir/audiovol"           
+     fwantvol="$logdir/audiowantvol"
+        fmute="$logdir/audiomuteflag"
+    fwantmute="$logdir/audiowantmuteflag"
+ flagdbusbusy="$logdir/audiodbusbusyflag"
+flagdbwaiting="$logdir/audiodbuswaitingflag"
+
+# audio vol, current volume (no metter if mutted or noted)
+# wantvol ... wanted volume
+# realvolume ... audiovol, but 0 if mutted
 
 function normalize()
-{  val=$1
-   if [ -z "$val" ]; then val=0
+{  vol=$1
+   if [ -z "$vol" ]; then vol=0
    else
-      [ "$1" -gt 100 ] && val=100
-      [ "$1" -lt 0   ] && val=0
+      [ "$1" -gt 100 ] && vol=100
+      [ "$1" -lt 0   ] && vol=0
    fi
-   printf $val
+   printf $vol
 }
-function getpercents()
-{  [ -f "$faudiovol" ] && volume=$(cat "$faudiovol") || volume=$defaultaudiovol
-   printf $volume #in percents
-}
+function getaudiovol() {  [ -f "$faudiovol" ] && volume=$(cat "$faudiovol") || volume=$defaultaudiovol; printf $volume; } #in percents
+function getwantvol()  {  [ -f "$fwantvol"  ] && volume=$(cat "$fwantvol")  || volume=$(getaudiovol);   printf $volume; } #in percents
+function getmute()     {  [ -f "$fmute"     ] && printf yes || printf no; }
+function getwantmute() {  [ -f "$fwantmute" ] && printf yes || printf no; }
 function osdmain() 
-{  str="$(cat $faudiovol)%" 
-   [ -f $fmute ] && str="MUTTED ( $str )" || str="volume: $str"
+{  str="$(getaudiovol)%" 
+   [ $(getmute) == "yes" ] && str="MUTTED ( $str )" || str="volume: $str"
    ./tvosd blink "$str"
 }
 function osdwishes()
-{  str="cmd: $(cat $fwantval)%" 
+{  str="cmd: $(getwantvol)%" 
 #   ./tvosd blink --y 0 "$str"
 }
-function mute()       { touch $fwantmute; osdmain; }
-function unmute()     { rm    $fwantmute; osdmain; }
-function togglemute() { [ -f  $fwantmute ] && unmute || mute ; }
+function togglemute() { [ $(getmute) == "yes" ] && touch $fwantmute || rm $fwantmute; }
 function percents2float() { printf "%.2f" $(bc -l <<< "scale=2; $1 / 100"); }
 function float2percents() { printf "%d"   $(bc -l <<< "$1 * 100"); }
-function dbussetcommand()
-{   rm -f $flagdbusdelay
-    touch $flagdbusbusy
-    settingvalpercents="$(cat $fwantval)"
-    settingvalfloat="$(percents2float $settingvalpercents)"
+function dbuscommandrun()
+{   dbuscmd="$1"; shift
+    dbusparams=( --print-reply --session --reply-timeout=500
+                 --dest=org.mpris.MediaPlayer2.omxplayer
+                 /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.$dbuscmd 
+                 $@ )
     export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/omxplayerdbus.${USER:-root})
-    dbus-send --print-reply --session --reply-timeout=500 --dest=org.mpris.MediaPlayer2.omxplayer \
-           /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Set \
-           string:"org.mpris.MediaPlayer2.Player" \
-           string:"Volume" double:"$settingvalfloat" &>/dev/null
-    echo -n $settingvalpercents > $faudiovol
-    rm    $flagdbusbusy
-    osdmain
+    #echo "running dbus-send with params:" 
+    #for i in ${dbusparams[@]}; do echo "   $i"; done
+    #echo  exported DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
+    dbus-send ${dbusparams[@]}  &>/dev/null
+}
+function dbussetcommand()
+{  touch $flagdbusbusy
+   wantvol=$(getwantvol)
+   if [ $(getaudiovol) != $wantvol ]; then 
+      settingvolfloat="$(percents2float $wantvol)"
+      dbuscommandrun Set string:org.mpris.MediaPlayer2.Player string:Volume double:$settingvolfloat
+      echo -n $wantvol > $faudiovol
+   fi
+   wantmute=$(getwantmute)
+   if [ $(getmute) != $wantmute ]; then
+      [ $wantmute == "yes" ] && cmd=Mute || cmd=Unmute
+      dbuscommandrun $cmd
+      [ $wantmute == "yes" ] && touch $fmute || rm $fmute 
+   fi
+   rm    $flagdbusbusy
+   osdmain
 }
 function dbusset() 
 {  osdwishes
    if [ -f $flagdbusbusy ]; then
-      if [ ! -f $flagdbusdelay ]; then
-         ( sleep 2; dbusset; ) & touch $flagdbusdelay
+      if [ ! -f $flagdbuswaiting ]; then
+         ( sleep 2; rm $flagdbuswaiting; ) & touch $flagdbuswaiting
       fi
    else
       dbussetcommand &
@@ -64,19 +81,20 @@ function dbusset()
 # getdbm - value in 'double' millibels used inside omxplayer, range: -6000:0
 # getdbl - value in float(double) range 0:1, used in dbus commands
 case "$1" in
-       get) getpercents ;;
-    getdmb) vol="$(getpercents)"; [ $vol -lt 1 ] && { printf -6000; break; } #avoid log 0
+       get) getaudiovol ;;
+    getdmb) vol="$(getaudiovol)"; [ $vol -lt 1 ] && { printf -6000; break; } #avoid log 0
 	    printf "%.0f"   $(bc -l <<< "scale=5; 2000 * l($vol / 100) / l(10)")
             ;; #dmb means double millibels, used in omxplayer start command params and stdin (+/-) interface
-    getdbl) printf "%.2f" $(bc -l <<< "scale=2; $(getpercents) / 100") ;;
+    getdbl) printf "%.2f" $(bc -l <<< "scale=2; $(getaudiovol) / 100") ;;
 getdmbreal) #getdmbreal used in omxplayer start command, inside tvsingle script
             [ -f $fmute ] && printf "%d" "-6000" || printf "%d"   $($0 getdmb) ;; #real value (0 if mutted)
 getdblreal) [ -f $fmute ] && printf 0            || printf "%.2f" $($0 getdbl) ;; #real value (0 if mutted)
    ontvoff) rm $faudiovol ;; # Mr.Cazim's practice
-        up) val=$(normalize $(bc <<<"$(cat $fwantval) + 1"))
-            printf $val > $fwantval; echo wval: $val;              dbusset ;;
-      down) val=$(normalize $(bc <<<"$(cat $fwantval) - 1"))
-            printf $val > $fwantval;               dbusset ;;
-togglemute) togglemute;                            dbusset ;;
+        up) vol=$(normalize $(bc <<<"$(getwantvol) + 5"))
+            printf $vol > $fwantvol; echo wvol: $vol;              dbusset ;;
+      down) vol=$(normalize $(bc <<<"$(getwantvol) - 5"))
+            printf $vol > $fwantvol; echo wvol: $vol;              dbusset ;;
+      mute) touch $fwantmute;                                      dbusset ;;
+    unmute) rm    $fwantmute;                                      dbusset ;;
+togglemute) togglemute;                                            dbusset ;;
 esac
-

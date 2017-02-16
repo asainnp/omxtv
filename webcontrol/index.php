@@ -1,5 +1,6 @@
 <head>
 <title>OMX-TV</title>
+<link rel='icon' href='omxtvicon.png' />
 <style>
 	ul { list-style-type: none; margin:0; padding:0; }
 	a  { text-decoration: none; }
@@ -15,7 +16,7 @@
 		while ($line =fgets($fp))
 		{
 			$nr++;
-			echo "<li><a href='http://$line/tv/local'> TV device $nr </a> ($line)";
+			echo "<li><a href='http://$line/tv/local'>TV device $nr </a> ($line)";
 		}
 	}
 ?>

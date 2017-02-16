@@ -11,7 +11,7 @@ maincmdfifo=$logdir/maincmdfifo
 echo $$ > $pidfilecmdloop
 
 while true; do
-   [ -p $maincmdfifo ] || { mkfifo $maincmdfifo; chmod 666 $maincmdfifo; }
+   [ -p $maincmdfifo ] || { mkfifo $maincmdfifo; chmod 622 $maincmdfifo; }
    read cmd < $maincmdfifo
    echo "switching command $cmd"
    ./controller $cmd
