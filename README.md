@@ -1,6 +1,6 @@
 
-IPTV for Raspberry
+IPTV for Raspberry Pi.
 
-current settings for: Moja WebTV, BHTelecom, Bosnia And Herzegovina
+configured for: Moja WebTV, BHTelecom, Bosnia And Herzegovina.
 ---
 using OMXPlayer and shell scripts, without KODI.
