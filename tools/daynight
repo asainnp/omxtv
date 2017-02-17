@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-. /etc/omxtv/omxtv.config
+. /etc/omxtv/omxtv.conf
 
 if [ "x$usecec" == "xyes" ]; then
    if command -v cec-client &>/dev/null; then
       case "$1" in
-         day)   /opt/vc/bin/tvservice -p ;;
-         night) /opt/vc/bin/tvservice -o ;;
+         day)   echo "on 0"      | cec-client -s ;;
+         night) echo "standby 0" | cec-client -s ;;
       esac
    fi
 else
    if command -v /opt/vc/bin/tvservice &>/dev/null; then
       case "$1" in
-         day)   echo "on 0"      | cec-client -s ;;
-         night) echo "standby 0" | cec-client -s ;;
+         day)   /opt/vc/bin/tvservice -p ;;
+         night) /opt/vc/bin/tvservice -o ;;
       esac
    fi
 fi
