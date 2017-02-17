@@ -1,4 +1,6 @@
+----------------------------------------------
 For using:
+----------------------------------------------
 - bc
 - fzf
 - pngview
@@ -9,18 +11,22 @@ For using:
 - changing text "Lavf/" to "OmxTV" inside string "Lavf/57.56.10X" of binary file:
    /usr/lib/libavformat.so.57.56.10X
   which is user-agent string of http requests while hls segments download.
+- libcec-rpi, if CEC supported monitor/tv exist
 
+----------------------------------------------
 For Web Control:
+----------------------------------------------
 - apache, php, php-apache,
      in httpd.conf changed loadmodule mod_mpm_event to mod_mpm_prefork
-     directoryindex index.php index.html
-     added lines: LoadModule php7_module modules/libphp7.so ; AddHandler php7-script php ; 
-                  Include conf/extra/php7_module.conf,
+     added lines: LoadModule php7_module modules/libphp7.so ; 
+                  AddHandler php7-script php ; Include conf/extra/php7_module.conf 
      sudo systemctl enable httpd, ... start httpd
 - ln -s /opt/omxtv/webcontrol /srv/http/tv or /var/www/tv (depends of apache version)
+  (make install by default put this link inside /srv/http/.)
 
+----------------------------------------------
 For compiling:
-- vim
-- git
-- make
-- gcc
+----------------------------------------------
+- git, make, gcc
+- vim, tmux         ...(optional)
+----------------------------------------------

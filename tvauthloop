@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-username=$(head -n1 /etc/omxtv/userpass)
-userpass=$(tail -n1 /etc/omxtv/userpass)
- authurl="https://www.bhtelecom.ba/index.php?id=6905&u=$username&p=$userpass&x=1"
+. /etc/omxtv/omxtv.conf   #full authurl variable should be inside this file.
 
 while true; do
    wget -qO- "$authurl"

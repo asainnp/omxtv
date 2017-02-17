@@ -1,0 +1,11 @@
+#this config will be included as bash-source, so variable syntax is bash
+
+#credentials for bhtelecom moja tv streams
+username=usernamehere
+password=passwordhere
+
+#authurl generating with above two vars:
+authurl="https://www.bhtelecom.ba/index.php?id=6905&u=$username&p=$userpass&x=1"
+
+#weather(yes) or not(no) to use CEC commands through HDMI
+usecec=no

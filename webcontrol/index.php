@@ -1,5 +1,5 @@
 <head>
-   <title>Menu <?php echo file_get_contents("/etc/hostname"); ?></title>
+   <title>OMX-TV <?php echo file_get_contents("/etc/hostname"); ?></title>
    <link rel='icon' href='/tv/omxtvicon.png' />
    <style>
       ul { list-style-type: none; margin:0; padding:0; }

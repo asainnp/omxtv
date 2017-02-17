@@ -35,10 +35,10 @@ uninstallconf:
 
 fulluninstall: uninstall uninstallconf
 
-configfiles: $(confdir) $(confdir)/userpass
+configfiles: $(confdir) $(confdir)/omxtv.conf
 $(confdir):
 	mkdir -p $@
-$(confdir)/userpass:
-	echo -e "userhere\npasswordhere" > $@
+$(confdir)/omxtv.conf:
+	cp tools/omxtv.conf.example $@
 	chmod 600 $@
 ###################################
