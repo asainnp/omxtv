@@ -2,6 +2,8 @@
 
 . /etc/omxtv/omxtv.conf
 
+echo usecec = $usecec
+
 if [ "x$usecec" == "xyes" ]; then
    if command -v cec-client &>/dev/null; then
       case "$1" in

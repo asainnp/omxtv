@@ -2,7 +2,7 @@
 
 #credentials for bhtelecom moja tv streams
 username=usernamehere
-password=passwordhere
+userpass=passwordhere
 
 #authurl generating with above two vars:
 authurl="https://www.bhtelecom.ba/index.php?id=6905&u=$username&p=$userpass&x=1"
