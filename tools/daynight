@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
-case "$1" in
-   day)   /opt/vc/bin/tvservice -p ;;
-   night) /opt/vc/bin/tvservice -o ;;
-esac
+if which cec-client; then
+   case "$1" in
+      day)   echo "on 0"      | cec-client -s ;;
+      night) echo "standby 0" | cec-client -s ;;
+   esac
+else
+   case "$1" in
+      day)   /opt/vc/bin/tvservice -p ;;
+      night) /opt/vc/bin/tvservice -o ;;
+   esac
+fi
