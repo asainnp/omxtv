@@ -16,7 +16,7 @@ For using:
 - ttf-liberation        ...(for pngview)
 - wget                  ...(for downloading m3u lists)
 - /opt/vc/bin/tvservice ...(usually preinstalled, for turning hdmi on/off)
-- libcec-rpi            ...( for turning CEC supported TV on/off)
+- libcec-rpi            ...(for turning CEC supported TV on/off)
 - changing text "Lavf/" to "OmxTV/" inside string "Lavf/57.56.10X" of binary file:
    /usr/lib/libavformat.so.57.56.10X
   which is user-agent string of http requests in hls segments downloads by ffmpeg.
