@@ -1,17 +1,25 @@
 ----------------------------------------------
+For installing:
+----------------------------------------------
+- ssh, git, make
+- gcc                    ...(optional, when compiling pngview)
+- vim, tmux              ...(optional)
+
+----------------------------------------------
 For using:
 ----------------------------------------------
-- bc
-- fzf
-- pngview
-- ttf-liberation
-- wget
-- omxplayer
-- /opt/vc/bin/tvservice (usually preinstalled)
+- payed subscription to bhtelecom internet (>=5mbs, 20km), plus mojaWebTv start+pink packet(2km)
+- omxplayer             ...(main dependency, for playing live video)
+- bc                    ...(for audio calculations)
+- fzf                   ...(optional, for cli interface only)
+- pngview               ...(for osd text)
+- ttf-liberation        ...(for pngview)
+- wget                  ...(for downloading m3u lists)
+- /opt/vc/bin/tvservice ...(usually preinstalled, for turning hdmi on/off)
+- libcec-rpi            ...( for turning CEC supported TV on/off)
 - changing text "Lavf/" to "OmxTV" inside string "Lavf/57.56.10X" of binary file:
    /usr/lib/libavformat.so.57.56.10X
   which is user-agent string of http requests while hls segments download.
-- libcec-rpi, if CEC supported monitor/tv exist
 
 ----------------------------------------------
 For Web Control:
@@ -24,9 +32,4 @@ For Web Control:
 - ln -s /opt/omxtv/webcontrol /srv/http/tv or /var/www/tv (depends of apache version)
   (make install by default put this link inside /srv/http/.)
 
-----------------------------------------------
-For compiling:
-----------------------------------------------
-- git, make, gcc
-- vim, tmux         ...(optional)
-----------------------------------------------
+----------------------------------------------eof.
