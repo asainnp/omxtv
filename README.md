@@ -11,4 +11,4 @@
 2. read [docs/dependencies](docs/dependencies) text file, ssh to pi and install dependencies first.
 3. on rpi: `git clone https://github.com/asainnp/omxtv && cd omxtv && sudo make install`
 4. on rpi: edit `/etc/omxtv/omxtv.conf` file to update credentials.
-5. go to `http://omxtvraspberryIP/tv` and click "Power ON" button.
+5. go to `http://omxtvraspberryIP/tv` and click "powerON" button.
