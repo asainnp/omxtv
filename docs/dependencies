@@ -17,9 +17,9 @@ For using:
 - wget                  ...(for downloading m3u lists)
 - /opt/vc/bin/tvservice ...(usually preinstalled, for turning hdmi on/off)
 - libcec-rpi            ...(for turning CEC supported TV on/off)
-- changing text "Lavf/" to "OmxTV/" inside string "Lavf/57.56.10X" of binary file:
-   /usr/lib/libavformat.so.57.56.10X
-  which is user-agent string of http requests in hls segments downloads by ffmpeg.
+- changing first 5 chars of text "Lavf/..." to "OmxTV" inside string "Lavf/57.56.10X" 
+  of binary file: /usr/lib/libavformat.so.57.56.10X
+  That is user-agent string of http requests in hls segments downloads by ffmpeg.
   vlc is probably forbidden by bhtelecom, but Kodi which uses omxplayer is allowed.
   So there was probably decision fault by them to deny by ua-string because both
   vlc and kodi->omxplayer uses ffmpeg(libav) in lower layers for http download. 
