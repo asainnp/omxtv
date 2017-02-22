@@ -21,8 +21,11 @@ For using:
   of binary file: /usr/lib/libavformat.so.57.56.10X
   That is user-agent string of http requests in hls segments downloads by ffmpeg.
   vlc is probably forbidden by bhtelecom, but Kodi which uses omxplayer is allowed.
-  So there was probably decision fault by them to deny by ua-string because both
-  vlc and kodi->omxplayer uses ffmpeg(libav) in lower layers for http download. 
+  There was probably decision fault by them to deny by ua-strings because both
+  vlc and kodi->omxplayer uses ffmpeg(libav) in lower layers for http download.
+  and this way they (hopefully unintentional) blocked all apps that uses ffmpeg,
+  which includes omxplayer and Kodi too. so ua change is legal because official 
+  Kodi plugin (https://webtv.bhtelecom.ba/repo/) won't work without it too.
 
 ----------------------------------------------
 For Web Control:
