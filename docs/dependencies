@@ -8,7 +8,7 @@ For installing:
 ----------------------------------------------
 For using:
 ----------------------------------------------
-- using bhtelecom internet (>=5mbs, 20km), with mojaWebTv start+pink (2km)
+- using bhtelecom internet (>=5mbs) with mojaWebTv subscription, or prepaid.
 - omxplayer             ...(main dependency, for playing live video)
 - bc                    ...(for audio calculations)
 - fzf                   ...(optional, for cli interface only)
@@ -17,8 +17,8 @@ For using:
 - wget                  ...(for downloading m3u lists)
 - /opt/vc/bin/tvservice ...(usually preinstalled, for turning hdmi on/off)
 - libcec-rpi            ...(for turning CEC supported TV on/off)
-- changing first 5 chars of text "Lavf/..." to "OmxTV" inside string "Lavf/57.56.10X" 
-  of binary file: /usr/lib/libavformat.so.57.56.10X
+- replacing first 5 chars of text "Lavf/..." to "OmxTV" inside string "Lavf/57.56.10X" 
+  of binary file: /usr/lib/libavformat.so.57.56.10X using e.g. 'vi editor' carefully.
   That is user-agent string of http requests in hls segments downloads by ffmpeg.
   vlc is probably forbidden by bhtelecom, but Kodi which uses omxplayer is allowed.
   There was probably decision fault by them to deny by ua-strings because both
@@ -26,7 +26,7 @@ For using:
   and this way they (hopefully unintentional) blocked all apps that uses ffmpeg,
   which includes omxplayer and Kodi too. so ua change is legal because official 
   Kodi plugin (https://webtv.bhtelecom.ba/repo/) won't work without it too.
-
+  
 ----------------------------------------------
 For Web Control:
 ----------------------------------------------
