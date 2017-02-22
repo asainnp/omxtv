@@ -1,9 +1,9 @@
 
-# IPTV for Raspberry Pi.
+## OmxTV - ipTV for Raspberry Pi, shell scripts wrapper for [omxplayer](https://github.com/popcornmix/omxplayer).
 
 * configured for: Moja WebTV, BHTelecom, Bosnia And Herzegovina.
 * using OMXPlayer and shell scripts, without KODI.
-* remote controlled by web interface, `http://omxtvraspberryIP/tv`, e.g. smartphone with home-shortcut to the link.
+* remote controlled by php-web menu `http://omxtvraspberryIP/tv`, e.g. on smartphone with home-shortcut to the link.
 
 ### Installation:
 
