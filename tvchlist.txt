@@ -167,4 +167,3 @@ radio_konjic
 radio_bugojno
 radio_kakanj
 radio_mix
-asaintest
