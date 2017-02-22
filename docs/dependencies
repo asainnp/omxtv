@@ -8,7 +8,7 @@ For installing:
 ----------------------------------------------
 For using:
 ----------------------------------------------
-- payed subscription to bhtelecom internet (>=5mbs, 20km), plus mojaWebTv start+pink packet(2km)
+- using bhtelecom internet (>=5mbs, 20km), with mojaWebTv start+pink (2km)
 - omxplayer             ...(main dependency, for playing live video)
 - bc                    ...(for audio calculations)
 - fzf                   ...(optional, for cli interface only)
@@ -17,9 +17,9 @@ For using:
 - wget                  ...(for downloading m3u lists)
 - /opt/vc/bin/tvservice ...(usually preinstalled, for turning hdmi on/off)
 - libcec-rpi            ...( for turning CEC supported TV on/off)
-- changing text "Lavf/" to "OmxTV" inside string "Lavf/57.56.10X" of binary file:
+- changing text "Lavf/" to "OmxTV/" inside string "Lavf/57.56.10X" of binary file:
    /usr/lib/libavformat.so.57.56.10X
-  which is user-agent string of http requests while hls segments download.
+  which is user-agent string of http requests in hls segments downloads by ffmpeg.
 
 ----------------------------------------------
 For Web Control:
