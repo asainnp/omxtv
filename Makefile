@@ -4,7 +4,7 @@ default: all
 installdir = /opt/omxtv
    confdir = /etc/omxtv
  mainfiles = forall.sh tv tvloop tvosd tvauthloop tvosd tvaudio cmdloop controller tvsingle tvchlist.txt
- toolfiles = tools/omxtv.service tools/daynight tools/pngview
+ toolfiles = $(addprefix tools/,omxtv.service daynight pngview uastring.sh)
   allfiles = $(mainfiles) $(toolfiles)
 apacheroot = /srv/http
   sysdlink = /etc/systemd/system/multi-user.target.wants/omxtv.service
