@@ -21,7 +21,7 @@
 		while ($line =fgets($fp))
 		{
 			$nr++;
-			if (!$search || strpos($line, $search) !== false)
+			if (!$search || stripos($line, trim($search)) !== false)
 			echo "<li>$nr) <a href='../tvcmd.php?cmd=PLAYCH%20$line'>$line</a>";
 		}
 	}
