@@ -1,4 +1,6 @@
 <?php
+   function getrq($key, $def=false) { return array_key_exists($key, $_REQUEST) ?$_REQUEST[$key] :$def; }
+
    function echotitle($title) 
    {  echo "<title>$title " .file_get_contents("/etc/hostname") ."</title>\n";
       echo "<link rel='icon' href='/tv/omxtvicon.png' />\n";

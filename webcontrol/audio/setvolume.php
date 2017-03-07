@@ -1,9 +1,10 @@
+<?php require_once('../common.php'); ?>
 <head>
-<title>Set Volume on <?php echo file_get_contents("/etc/hostname"); ?></title>
-<style>
+   <?php echotitle("Set Volume on"); ?>
+   <style>
 	li,input { font-size:3em; } 
         ul { list-style-type: none; }
-</style>
+   </style>
 </head>
 <form method='get' action='../tvcmd.php'>
 	<input type='hidden' name='cmd' value='VOLUMESET'/>
