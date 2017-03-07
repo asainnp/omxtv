@@ -1,14 +1,16 @@
+<?php require_once('../common.php'); ?>
 <head>
-   <title>Channels <?php echo file_get_contents("/etc/hostname"); ?></title>
-   <link rel='icon' href='/tv/omxtvicon.png' />
+   <?php echotitle("Channels"); ?>
    <style>
       ul { list-style-type: none; margin:0; padding:0; }
       a  { text-decoration: none; font-size: 4em; background: blue; color: white; border-radius: .2em; padding:.1em; }
       li { margin: 2em; font-size:2em; }
+      <?php echologcss(); ?>
    </style>
 </style>
 </head>
 <ul>
+<?php echologdiv(); ?>
 <?php
 	if ($fp =fopen("/opt/omxtv/tvchlist.txt", "r"))
 	{

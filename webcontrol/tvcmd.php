@@ -6,5 +6,8 @@
 
    exec("echo $cmd > /tmp/omxtvstatuslog/maincmdfifo");
 
+   session_start(); if (!isset($_SESSION['omxtvlog'])) $_SESSION['omxtvlog'] =array();
+   $_SESSION['omxtvlog'][] ="$cmd";
+
    header('Location: ' .$_SERVER['HTTP_REFERER']);
 ?>
