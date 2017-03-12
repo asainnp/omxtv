@@ -2,10 +2,12 @@
 <head>
    <?php echotitle("Set Volume on"); ?>
    <style>
-	li,input { font-size:3em; } 
-        ul { list-style-type: none; }
+        <?php echocommoncss(); ?>
+	form li, form input { font-size:3em; } 
    </style>
 </head>
+<body>
+<?php echocommondiv(); ?>
 <form method='get' action='../tvcmd.php'>
 	<input type='hidden' name='cmd' value='VOLUMESET'/>
 	<ul>
@@ -14,3 +16,4 @@
 	<li><input type='submit' value='SET' />
 	<ul>
 </form>
+</body>

@@ -3,7 +3,7 @@ default: all
 
 installdir = /opt/omxtv
    confdir = /etc/omxtv
- mainfiles = forall.sh tv tvloop tvosd tvauthloop tvosd tvaudio cmdloop controller tvsingle tvchlist.txt
+ mainfiles = $(addprefix scripts/,forall.sh tv tvloop tvauthloop tvosd tvaudio cmdloop controller tvsingle)
  toolfiles = $(addprefix tools/,omxtv.service daynight pngview uastring.sh)
   allfiles = $(mainfiles) $(toolfiles)
 apacheroot = /srv/http
